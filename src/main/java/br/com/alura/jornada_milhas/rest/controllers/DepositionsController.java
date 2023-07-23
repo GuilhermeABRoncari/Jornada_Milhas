@@ -14,28 +14,28 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @RestController
-@RequestMapping("/depoimentos")
 @AllArgsConstructor
 public class DepositionsController {
 
     private TestimonyRepository repository;
 
-    @PostMapping
+    @PostMapping("/depoimentos")
     @Transactional
     public ResponseEntity<TestimonyResponseDto> post(@RequestBody @Valid TestimonyRequestDto testimonyRequestDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(new TestimonyResponseDto(repository.save(new Testimony(testimonyRequestDto))));
     }
 
-    @GetMapping
+    @GetMapping("/depoimentos")
     public ResponseEntity<List<TestimonyResponseDto>> getAll() {
         List<TestimonyResponseDto> response = new ArrayList<>();
         repository.findAll().forEach(testimony -> response.add(new TestimonyResponseDto(testimony)));
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping
+    @PutMapping("/depoimentos")
     @Transactional
     public ResponseEntity<TestimonyResponseDto> edit(@RequestBody TestimonyRequestDto testimonyRequestDto) {
         var testimony = repository.findById(testimonyRequestDto.id()).orElseThrow(() -> new TestimonyNotFoundException("Depoimento não encontrado"));
@@ -43,11 +43,36 @@ public class DepositionsController {
         return ResponseEntity.ok(new TestimonyResponseDto(testimony));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/depoimentos/{id}")
     @Transactional
     public ResponseEntity<HttpStatus> delete(@PathVariable String id) {
         repository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/depoimentos-home")
+    public ResponseEntity<List<TestimonyResponseDto>> getRandomThreeDepositions() {
+        List<Testimony> all = repository.findAll();
+        List<TestimonyResponseDto> response = new ArrayList<>();
+        all.forEach(testimony -> response.add(new TestimonyResponseDto(testimony)));
+
+        if (response.size() <= 3) {
+            return ResponseEntity.ok(response);
+        } else {
+            List<TestimonyResponseDto> randomThreeDepositions = new ArrayList<>();
+            Random random = new Random();
+
+            while (randomThreeDepositions.size() < 3) {
+                int randomIndex = random.nextInt(response.size());
+                TestimonyResponseDto randomDeposition = response.get(randomIndex);
+
+                if (!randomThreeDepositions.contains(randomDeposition)) {
+                    randomThreeDepositions.add(randomDeposition);
+                }
+            }
+
+            return ResponseEntity.ok(randomThreeDepositions);
+        }
+
+    }
 }
