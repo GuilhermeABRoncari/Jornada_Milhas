@@ -10,8 +10,8 @@ import java.time.OffsetDateTime;
 @RestControllerAdvice
 public class ExceptionsInternalHandler {
 
-    @ExceptionHandler(TestimonyNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleTestimonyNotFoundException(TestimonyNotFoundException ex) {
+    @ExceptionHandler(InternalEntityNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleTestimonyNotFoundException(InternalEntityNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage()));
     }
 

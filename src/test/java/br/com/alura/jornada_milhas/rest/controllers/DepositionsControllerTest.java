@@ -4,7 +4,7 @@ import br.com.alura.jornada_milhas.domain.dtos.requests.TestimonyRequestDto;
 import br.com.alura.jornada_milhas.domain.dtos.responses.TestimonyResponseDto;
 import br.com.alura.jornada_milhas.domain.entitys.Testimony;
 import br.com.alura.jornada_milhas.domain.repositorys.TestimonyRepository;
-import br.com.alura.jornada_milhas.infra.exceptions.TestimonyNotFoundException;
+import br.com.alura.jornada_milhas.infra.exceptions.InternalEntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -118,7 +118,7 @@ class DepositionsControllerTest {
         var requestedBody = new TestimonyRequestDto(invalidId, profilePicture, testimony, author);
 
         // Then // When
-        assertThrows(TestimonyNotFoundException.class, () -> {
+        assertThrows(InternalEntityNotFoundException.class, () -> {
             ResponseEntity<TestimonyResponseDto> controllerResponse = controller.edit(requestedBody);
             assertEquals(HttpStatus.BAD_REQUEST, controllerResponse.getStatusCode());
         });

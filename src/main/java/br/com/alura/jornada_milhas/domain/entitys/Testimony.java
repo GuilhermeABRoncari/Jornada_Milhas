@@ -12,10 +12,10 @@ import java.time.OffsetDateTime;
 
 @Entity(name = "Testimony")
 @Table(name = "testimony")
-@AllArgsConstructor
-@NoArgsConstructor
-@EqualsAndHashCode(of = "id")
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
 @JsonIgnoreProperties({"hibernateLazyInitializer"})
 public class Testimony {
 

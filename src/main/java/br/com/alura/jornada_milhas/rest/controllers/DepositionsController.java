@@ -4,7 +4,7 @@ import br.com.alura.jornada_milhas.domain.dtos.requests.TestimonyRequestDto;
 import br.com.alura.jornada_milhas.domain.dtos.responses.TestimonyResponseDto;
 import br.com.alura.jornada_milhas.domain.entitys.Testimony;
 import br.com.alura.jornada_milhas.domain.repositorys.TestimonyRepository;
-import br.com.alura.jornada_milhas.infra.exceptions.TestimonyNotFoundException;
+import br.com.alura.jornada_milhas.infra.exceptions.InternalEntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -38,7 +38,7 @@ public class DepositionsController {
     @PutMapping("/depoimentos")
     @Transactional
     public ResponseEntity<TestimonyResponseDto> edit(@RequestBody TestimonyRequestDto testimonyRequestDto) {
-        var testimony = repository.findById(testimonyRequestDto.id()).orElseThrow(() -> new TestimonyNotFoundException("Depoimento não encontrado"));
+        var testimony = repository.findById(testimonyRequestDto.id()).orElseThrow(() -> new InternalEntityNotFoundException("Depoimento não encontrado"));
         testimony.update(testimonyRequestDto);
         return ResponseEntity.ok(new TestimonyResponseDto(testimony));
     }
