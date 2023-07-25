@@ -7,6 +7,8 @@ import br.com.alura.jornada_milhas.domain.repositorys.DestinationRepository;
 import br.com.alura.jornada_milhas.infra.exceptions.InternalEntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,14 +28,9 @@ public class DestinationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new DestinationResponseDto(repository.save(new Destination(dto))));
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<DestinationResponseDto>> getAll() {
-        List<DestinationResponseDto> response = new ArrayList<>();
-        List<Destination> all = repository.findAll();
-
-        all.forEach(destination -> response.add(new DestinationResponseDto(destination)));
-
-        return ResponseEntity.ok(response);
+    @GetMapping("/todos")
+    public ResponseEntity<Page<DestinationResponseDto>> getAll(Pageable page) {
+        return ResponseEntity.ok(repository.findAll(page).map(DestinationResponseDto::new));
     }
 
     @PutMapping("/{id}")
