@@ -3,15 +3,16 @@ package br.com.alura.jornada_milhas.rest.controllers;
 import br.com.alura.jornada_milhas.domain.dtos.requests.DestinationRequestDto;
 import br.com.alura.jornada_milhas.domain.dtos.responses.DestinationResponseDto;
 import br.com.alura.jornada_milhas.domain.entitys.Destination;
-import br.com.alura.jornada_milhas.domain.repositorys.DestinationRepository;
-import br.com.alura.jornada_milhas.infra.exceptions.InternalEntityNotFoundException;
+import br.com.alura.jornada_milhas.rest.service.DestinationService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -19,10 +20,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -30,137 +29,189 @@ class DestinationControllerTest {
 
     private DestinationController controller;
     @Mock
-    private DestinationRepository repository;
+    private DestinationService service;
+    private Pageable page;
+
+    private DestinationRequestDto completeDestinationRequestDto;
+    private DestinationRequestDto whitoutDescriptionTextDestinationRequestDto;
+    private List<DestinationResponseDto> destinationsResponse;
+    private Page<DestinationResponseDto> responseDtoPage;
+    private DestinationRequestDto editedDestinationRequestDto;
+
+    private Destination firstDestination;
+    private DestinationResponseDto firstDestinationResponseDto;
 
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        controller = new DestinationController(repository);
+        controller = new DestinationController(service);
+        destinationsResponse = new ArrayList<>();
+
+        completeDestinationRequestDto = new DestinationRequestDto(
+                "Belo Horizonte", "pictureURL.com", "pictureURL.com",
+                "meta description", "Gracefully description", new BigDecimal("100.00"));
+
+        whitoutDescriptionTextDestinationRequestDto = new DestinationRequestDto(
+                "Belo Horizonte", "pictureURL.com", "pictureURL.com",
+                "meta description", "", new BigDecimal("100.00"));
+
+        editedDestinationRequestDto = new DestinationRequestDto(
+                "Perdigão", null, null, null, "Gracefully description",
+                null);
+
+        firstDestination = new Destination(completeDestinationRequestDto);
+        firstDestinationResponseDto = new DestinationResponseDto(firstDestination);
+        destinationsResponse.add(firstDestinationResponseDto);
+        responseDtoPage = new PageImpl<>(destinationsResponse);
+
+        page = new Pageable() {
+            @Override
+            public int getPageNumber() {
+                return 0;
+            }
+
+            @Override
+            public int getPageSize() {
+                return 20;
+            }
+
+            @Override
+            public long getOffset() {
+                return 0;
+            }
+
+            @Override
+            public Sort getSort() {
+                return Sort.unsorted();
+            }
+
+            @Override
+            public Pageable next() {
+                return null;
+            }
+
+            @Override
+            public Pageable previousOrFirst() {
+                return null;
+            }
+
+            @Override
+            public Pageable first() {
+                return null;
+            }
+
+            @Override
+            public Pageable withPage(int pageNumber) {
+                return null;
+            }
+
+            @Override
+            public boolean hasPrevious() {
+                return false;
+            }
+        };
     }
 
     @Test
-    void testPostMethodWhitValidRequestBody() {
+    @DisplayName("Test post method whit correct new destination and expect status code 201 CREATED")
+    void testPostMethodScene01() {
         // Given
-        String destinationName = "destination";
-        String pictureUrl = "Picture URL";
-        BigDecimal price = new BigDecimal("10.00");
-        var body = new DestinationRequestDto(destinationName, pictureUrl, price);
-        var destination = new Destination(body);
-        var responseDto = new DestinationResponseDto(destination);
-        when(repository.save(destination)).thenReturn(destination);
+        when(service.create(completeDestinationRequestDto)).thenReturn(firstDestinationResponseDto);
 
         // When
-        ResponseEntity<DestinationResponseDto> controllerResponse = controller.post(body);
+        ResponseEntity<DestinationResponseDto> controllerResponse = controller.post(completeDestinationRequestDto);
 
         // Then
         assertEquals(HttpStatus.CREATED, controllerResponse.getStatusCode());
-        assertEquals(responseDto, controllerResponse.getBody());
-        verify(repository).save(destination);
+        verify(service).create(completeDestinationRequestDto);
     }
 
     @Test
-    void testGetAllMethod() {
+    @DisplayName("Test post method whit destination without descriptionText and expect status code 201 CREATED whit AI generated descriptionText")
+    void testPostMethodScene02() {
         // Given
-        List<Destination> destinations = new ArrayList<>();
-        destinations.add(new Destination("ID", "Destination 1", "URL 1", BigDecimal.valueOf(100)));
-        destinations.add(new Destination("ID", "Destination 2", "URL 2", BigDecimal.valueOf(200)));
-
-        Page<Destination> page = new PageImpl<>(destinations);
-        when(repository.findAll(any(PageRequest.class))).thenReturn(page);
+        when(service.create(whitoutDescriptionTextDestinationRequestDto)).thenReturn(firstDestinationResponseDto);
 
         // When
-        ResponseEntity<Page<DestinationResponseDto>> controllerResponse = controller.getAll(PageRequest.of(0, 10));
+        ResponseEntity<DestinationResponseDto> controllerResponse = controller.post(whitoutDescriptionTextDestinationRequestDto);
+
+        // Then
+        assertEquals(HttpStatus.CREATED, controllerResponse.getStatusCode());
+        assertFalse(Objects.requireNonNull(controllerResponse.getBody()).descriptionText().isBlank());
+        verify(service).create(whitoutDescriptionTextDestinationRequestDto);
+    }
+
+    @Test
+    @DisplayName("Test findAll method and expect status code 200 OK")
+    void testFinAllMethodScene01() {
+        // Given
+        when(service.findAll(page)).thenReturn(responseDtoPage);
+
+        // When
+        ResponseEntity<Page<DestinationResponseDto>> controllerResponse = controller.getAll((org.springframework.data.domain.Pageable) page);
 
         // Then
         assertEquals(HttpStatus.OK, controllerResponse.getStatusCode());
-        assertEquals(2, Objects.requireNonNull(controllerResponse.getBody()).getTotalElements());
-        verify(repository).findAll(any(PageRequest.class));
+        verify(service).findAll(page);
     }
 
     @Test
-    void testEditMethod() {
+    @DisplayName("Test edit method and expect status code 200 OK")
+    void testEditMethodScene01() {
         // Given
-        String id = "ID";
-        String destinationName = "Destination";
-        String newDestinationName = "New destination name";
-        String pictureUrl = "URL";
-        BigDecimal price = new BigDecimal("500.00");
-        Destination destination = new Destination(id, destinationName, pictureUrl, price);
-
-        DestinationRequestDto dto = new DestinationRequestDto(newDestinationName, null, null);
-        when(repository.findById(id)).thenReturn(Optional.of(destination));
+        firstDestination.update(editedDestinationRequestDto);
+        DestinationResponseDto editedDestinationResponseDto = new DestinationResponseDto(firstDestination);
+        when(service.editDestinationById(firstDestination.getId(), editedDestinationRequestDto)).thenReturn(editedDestinationResponseDto);
 
         // When
-        ResponseEntity<DestinationResponseDto> controllerResponse = controller.edit(id, dto);
+        ResponseEntity<DestinationResponseDto> controllerResponse = controller.edit(firstDestination.getId(), editedDestinationRequestDto);
 
         // Then
         assertEquals(HttpStatus.OK, controllerResponse.getStatusCode());
-        assertNotEquals(destinationName, Objects.requireNonNull(controllerResponse.getBody()).destinationName());
-        verify(repository).findById(id);
+        verify(service).editDestinationById(firstDestination.getId(), editedDestinationRequestDto);
     }
 
     @Test
-    void testEditMethodThenCatchInternalEntityNotFoundException() {
+    @DisplayName("Test delete method and expect status code 204 NO_CONTENT")
+    void testDeleteMethodScene01() {
         // Given
-        String id = "ID";
-        String destinationName = "Destination";
-        String pictureUrl = "URL";
-        BigDecimal price = new BigDecimal("500.00");
-
-        // When // Then
-        assertThrows(InternalEntityNotFoundException.class, () -> {
-            ResponseEntity<DestinationResponseDto> controllerResponse = controller.edit(id, new DestinationRequestDto(destinationName, pictureUrl, price));
-            assertEquals(HttpStatus.NOT_FOUND, controllerResponse.getStatusCode());
-        });
-    }
-
-    @Test
-    void testDeleteMethod() {
-        // Given
-        String id = "ID";
+        destinationsResponse.remove(firstDestinationResponseDto);
 
         // When
-        ResponseEntity<HttpStatus> response = controller.delete(id);
+        ResponseEntity<HttpStatus> controllerResponse = controller.delete(firstDestination.getId());
 
         // Then
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertTrue(destinationsResponse.isEmpty());
+        assertEquals(HttpStatus.NO_CONTENT, controllerResponse.getStatusCode());
     }
 
     @Test
-    void testSearchMethod() {
+    @DisplayName("Test search method and expect status code 200 OK")
+    void testSearchMethodeScene01() {
         // Given
-        String search = "bel$..;´´";
-        String sanitizedSearch = search.trim();
-
-        String id = "ID";
-        String destinationName = "Belo Horizonte";
-        String pictureUrl = "URL";
-        BigDecimal price = new BigDecimal("500.00");
-        Destination destination = new Destination(id, destinationName, pictureUrl, price);
-        List<Destination> listResult = new ArrayList<>();
-        listResult.add(destination);
-        when(repository.findAllByDestinationNameLikeIgnoreCase("%" + sanitizedSearch + "%")).thenReturn(listResult);
+        String query = "bel";
+        when(service.searchByClientQuery(query)).thenReturn(destinationsResponse);
 
         // When
-        ResponseEntity<List<DestinationResponseDto>> response = controller.search(search);
+        ResponseEntity<List<DestinationResponseDto>> controllerResponse = controller.search(query);
 
         // Then
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(listResult.size(), response.getBody().size());
-        verify(repository).findAllByDestinationNameLikeIgnoreCase("%" + sanitizedSearch + "%");
+        assertEquals(HttpStatus.OK, controllerResponse.getStatusCode());
+        assertEquals(destinationsResponse, controllerResponse.getBody());
+        verify(service).searchByClientQuery(query);
     }
 
     @Test
-    void testSearchMethodThenCatchInternalEntityNotFoundException() {
+    @DisplayName("Test getById method and expect status code 200 OK")
+    void testGetByIdMethodScene01() {
         // Given
-        String search = "123456";
-        String exceptionMessage = "Nenhum destino encontrado";
+        when(service.findById(firstDestination.getId())).thenReturn(firstDestinationResponseDto);
 
-        // When // Then
-        assertThrows(InternalEntityNotFoundException.class, () -> {
-            ResponseEntity<List<DestinationResponseDto>> response = controller.search(search);
-            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-            assertEquals(exceptionMessage, response.getBody());
-        });
+        // When
+        ResponseEntity<DestinationResponseDto> controllerResponse = controller.getById(firstDestination.getId());
+
+        // Then
+        assertEquals(HttpStatus.OK, controllerResponse.getStatusCode());
+        verify(service).findById(firstDestination.getId());
     }
 }

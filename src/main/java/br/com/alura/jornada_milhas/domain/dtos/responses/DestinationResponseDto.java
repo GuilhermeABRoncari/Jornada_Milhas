@@ -9,12 +9,19 @@ public record DestinationResponseDto(
         String id,
         @JsonProperty("nome")
         String destinationName,
-        @JsonProperty("foto")
-        String pictureUrl,
+        @JsonProperty("foto_1")
+        String firstPictureUrl,
+        @JsonProperty("foto_2")
+        String secondPictureUrl,
+        String meta,
+        @JsonProperty("text_descritivo")
+        String descriptionText,
         @JsonProperty("preço")
         BigDecimal price
 ) {
     public DestinationResponseDto(Destination destination) {
-        this(destination.getId(), destination.getDestinationName(), destination.getPictureUrl(), destination.getPrice());
+        this(destination.getId(), destination.getDestinationName(), destination.getFirstPictureUrl(),
+                destination.getSecondPictureUrl(), destination.getMeta(), destination.getDescriptionText(),
+                destination.getPrice());
     }
 }
