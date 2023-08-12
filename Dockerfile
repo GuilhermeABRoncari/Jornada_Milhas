@@ -5,7 +5,7 @@ FROM openjdk:17-jdk AS build
 WORKDIR /app
 
 # Copia o arquivo build.gradle e settings.gradle para permitir o cache das dependências
-COPY build.gradle .
+COPY build .
 # COPY settings.gradle .
 
 # Copia todos os outros arquivos do projeto
