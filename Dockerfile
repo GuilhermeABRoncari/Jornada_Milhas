@@ -7,13 +7,15 @@ WORKDIR /app
 # Copia o arquivo build.gradle e settings.gradle para permitir o cache das dependências
 COPY build.gradle.kts .
 COPY settings.gradle.kts .
+COPY gradlew .
 # COPY settings.gradle .
 
 # Copia todos os outros arquivos do projeto
 COPY . .
 
 # Constrói o projeto usando o wrapper do Gradle
-RUN chmod +x gradlew && ./gradlew clean build -x test
+RUN chmod +x gradlew
+RUN ./gradlew clean build -x test
 
 # Segunda etapa: executar o aplicativo
 FROM openjdk:17-jdk-slim
