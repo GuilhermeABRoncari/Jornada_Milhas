@@ -132,15 +132,18 @@ Exemplo da resposta:
 
 `POST /destinos`
 
-Utilizar este verbo Http (POST) permite cadastrar um novo destino. O corpo da requisição deve conter um objeto JSON com os seguintes campos obrigatórios: "nome" (nome do destino), "foto" (URL da foto do autor) e "preço" (valor decimal).
+Utilizar este verbo Http (POST) permite cadastrar um novo destino. O corpo da requisição deve conter um objeto JSON com os seguintes campos obrigatórios: "nome" (nome do destino), "foto_1" (URL da foto do destino), "foto_2" (URL da foto do destino), "meta" (Texto breve de cabeçalho), "texto_descritivo" (texto que pode ser fornecido pelo usuario ou preenchido por IA caso venha nulo) e "preço" (valor decimal).
 
 Exemplo de requisição:
 
 ```json
 {
-  "nome": "Belo Horizonte",
-  "foto": "alguamUrlDeImagemAleatoria.com",
-  "preço": 500.00
+    "nome": "Belo Horizonte",
+    "foto_1": "https://th.bing.com/th/id/OIP.v-P9aYWgMIwcZQzGezTQHAHaE9?pid=ImgDet&rs=1",
+    "foto_2": "https://th.bing.com/th/id/OIP.v-P9aYWgMIwcZQzGezTQHAHaE9?pid=ImgDet&rs=1",
+    "meta": "campo meta que deve ser preenchido com até 160 caracteres",
+    "texto_descritivo": "",
+    "preço": 300.00
 }
 ```
 
@@ -156,22 +159,13 @@ Exemplo de resposta:
 {
     "content": [
         {
-            "nome": "Perdigão",
-            "foto": "https://blog-static.infra.grancursosonline.com.br/wp-content/uploads/2015/09/03173942/Perdig%C3%A3o-MG.jpg",
-            "preço": 50.00,
-            "id": "822bd50d-db54-4d5b-a927-0da9926c7c39"
-        },
-        {
-            "nome": "Nova Serrana",
-            "foto": "https://th.bing.com/th/id/OIP.DiuwIPy6ud8KQ0iGt9kRLgHaFj?pid=ImgDet&rs=1",
-            "preço": 150.00,
-            "id": "1a027e1d-d25d-43b9-b024-2934093645bb"
-        },
-        {
             "nome": "Belo Horizonte",
-            "foto": "https://th.bing.com/th/id/OIP.v-P9aYWgMIwcZQzGezTQHAHaE9?pid=ImgDet&rs=1",
+            "foto_1": "https://th.bing.com/th/id/OIP.v-P9aYWgMIwcZQzGezTQHAHaE9?pid=ImgDet&rs=1",
+            "foto_2": "Some picture URL",
+            "text_descritivo": " \n\nBelo Horizonte é um lugar incrível que vai atender às suas necessidades. Com ambiência charmosa, é a 5ª maior cidade do Brasil e conta com atrativos culturais, arquitetônicos, gastronômicos see culturais. Uma cidade jovem e moderna é o lugar ideal para quem busca vida agitada em meio a charmosa paisagem. \n\nConhecida como a \"Cidade-Canção\", Belo Horizonte tem mais de 500 anos de história e é repleta de maravilhosas atrações para todos os gostos e estilos. Com excelente infraestrutura e linda natureza, encontra-se resposta para todos os níveis de lazer e entretenimento. Um lugar para todos os gostos que diverte e enriquece quem lá vive.",
             "preço": 300.00,
-            "id": "1177870f-a21f-4262-ba18-ba3f1cdbf9d1"
+            "id": "d02036c2-f0e6-41a3-a766-6191947e5220",
+            "meta": "campo meta que deve ser preenchido com até 160 caracteres"
         }
     ],
     "pageable": {
@@ -183,12 +177,13 @@ Exemplo de resposta:
         "offset": 0,
         "pageNumber": 0,
         "pageSize": 20,
-        "unpaged": false,
-        "paged": true
+        "paged": true,
+        "unpaged": false
     },
     "last": true,
-    "totalElements": 3,
+    "totalElements": 5,
     "totalPages": 1,
+    "first": true,
     "size": 20,
     "number": 0,
     "sort": {
@@ -196,8 +191,7 @@ Exemplo de resposta:
         "sorted": false,
         "unsorted": true
     },
-    "first": true,
-    "numberOfElements": 3,
+    "numberOfElements": 5,
     "empty": false
 }
 ```
@@ -212,10 +206,13 @@ Exemplo de resposta:
 
 ```json
 {
-    "nome": "Perdigão",
-    "foto": "https://blog-static.infra.grancursosonline.com.br/wp-content/uploads/2015/09/03173942/Perdig%C3%A3o-MG.jpg",
+    "nome": "Belo Horizonte",
+    "foto_1": "https://blog-static.infra.grancursosonline.com.br/wp-content/uploads/2015/09/03173942/Perdig%C3%A3o-MG.jpg",
+    "foto_2": null,
+    "text_descritivo": "\n\nBelo Horizonte é um lugar incrível que vai atender às suas necessidades. Com ambiência charmosa, é a 5ª maior cidade do Brasil e conta com atrativos culturais, arquitetônicos, gastronômicos see culturais. Uma cidade jovem e moderna é o lugar ideal para quem busca vida agitada em meio a charmosa paisagem. \n\nConhecida como a \"Cidade-Canção\", Belo Horizonte tem mais de 500 anos de história e é repleta de maravilhosas atrações para todos os gostos e estilos. Com excelente infraestrutura e linda natureza, encontra-se resposta para todos os níveis de lazer e entretenimento. Um lugar para todos os gostos que diverte e enriquece quem lá vive.",
     "preço": 50.00,
-    "id": "822bd50d-db54-4d5b-a927-0da9926c7c39"
+    "id": "822bd50d-db54-4d5b-a927-0da9926c7c39",
+    "meta": null
 }
 ```
 
@@ -240,11 +237,14 @@ Exemplo de resposta para uma pesquisa como "GET:/destinos?nome=bel"
 ```json
 [
     {
-        "nome": "Belo Horizonte",
-        "foto": "https://th.bing.com/th/id/OIP.v-P9aYWgMIwcZQzGezTQHAHaE9?pid=ImgDet&rs=1",
-        "preço": 300.00,
-        "id": "1177870f-a21f-4262-ba18-ba3f1cdbf9d1"
-    }
+            "nome": "Belo Horizonte",
+            "foto_1": "https://th.bing.com/th/id/OIP.v-P9aYWgMIwcZQzGezTQHAHaE9?pid=ImgDet&rs=1",
+            "foto_2": "Some picture URL",
+            "text_descritivo": " \n\nBelo Horizonte é um lugar incrível que vai atender às suas necessidades. Com ambiência charmosa, é a 5ª maior cidade do Brasil e conta com atrativos culturais, arquitetônicos, gastronômicos see culturais. Uma cidade jovem e moderna é o lugar ideal para quem busca vida agitada em meio a charmosa paisagem. \n\nConhecida como a \"Cidade-Canção\", Belo Horizonte tem mais de 500 anos de história e é repleta de maravilhosas atrações para todos os gostos e estilos. Com excelente infraestrutura e linda natureza, encontra-se resposta para todos os níveis de lazer e entretenimento. Um lugar para todos os gostos que diverte e enriquece quem lá vive.",
+            "preço": 300.00,
+            "id": "d02036c2-f0e6-41a3-a766-6191947e5220",
+            "meta": "campo meta que deve ser preenchido com até 160 caracteres"
+        }
 ]
 ```
 
@@ -266,6 +266,10 @@ Caso não seja encontrado nenhum destino que combine com a pesquisa feita será 
 
 *SEGUNDA SEMANA*: https://trello.com/b/lGCYMtrk/semana-2
 
+*TERCEIRA E QUARTA SEMANAS*: https://trello.com/b/CWH1ELsD/semana-3
+
 `Em andamento`:
 
-*TERCEIRA E QUARTA SEMANAS*: https://trello.com/b/Cuh1vI9X/alurachallengebackend7-semana-3
+Deploy no Render
+
+
