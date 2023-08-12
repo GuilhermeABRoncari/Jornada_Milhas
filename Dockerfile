@@ -14,7 +14,7 @@ COPY . .
 
 # Constrói o projeto usando o wrapper do Gradle
 RUN chmod +x ./gradlew
-RUN ./gradlew clean build -x test
+RUN ./gradlew clean build
 
 # Segunda etapa: executar o aplicativo
 FROM openjdk:17-jdk-slim
