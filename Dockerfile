@@ -1,21 +1,12 @@
-# Primeira etapa: construir o projeto
-FROM openjdk:17-jdk AS build
+FROM ubuntu:latest AS build
 
-# Define o diretório de trabalho
-WORKDIR /app
-
-# Copia o arquivo build.gradle e settings.gradle para permitir o cache das dependências
-COPY build.gradle.kts .
-COPY settings.gradle.kts .
-COPY gradlew .
-# COPY settings.gradle .
-
-# Copia todos os outros arquivos do projeto
+RUN apt-get update
+RUN apt-get install openjdk-17-jdk -y
 COPY . .
 
 # Constrói o projeto usando o wrapper do Gradle
 RUN chmod +x gradlew
-RUN ./gradlew clean build --no-daemon
+RUN ./gradlew clean build -x test
 
 # Segunda etapa: executar o aplicativo
 FROM openjdk:17-jdk-slim
@@ -24,7 +15,9 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copia o arquivo JAR construído na etapa anterior
-COPY --from=build /app/build/libs/adopet-api-0.0.1-SNAPSHOT.jar .
+# RUN find / -name jornada_milhas-0.0.1-SNAPSHOT.jar | xargs -I {} mv {} /app
+
+COPY --from=build ../build/libs/jornada_milhas-0.0.1-SNAPSHOT.jar .
 
 # Expõe a porta 8080
 EXPOSE 8080
