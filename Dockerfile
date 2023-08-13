@@ -20,5 +20,12 @@ COPY --from=build ../build/libs/jornada_milhas-0.0.1-SNAPSHOT.jar .
 # Expõe a porta 8080
 EXPOSE 8080
 
+ENV APIKEY=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
+ENV HOSTNAME=db.gmxwigliolbhqtfzyipr.supabase.co
+ENV DBNAME=postgres
+ENV PORT=5432
+ENV DBUSER=postgres
+ENV DBPASSWORD=ETtvQdj5sZwWxFuS
+
 # Define o comando de entrada para iniciar o aplicativo
 CMD ["java", "-jar", "jornada_milhas-0.0.1-SNAPSHOT.jar"]
