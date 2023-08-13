@@ -5,6 +5,7 @@ RUN apt-get install openjdk-17-jdk -y
 COPY . .
 
 # Constrói o projeto usando o wrapper do Gradle
+RUN chmod +x java
 RUN chmod +x gradlew
 RUN ./gradlew clean build -x test
 
