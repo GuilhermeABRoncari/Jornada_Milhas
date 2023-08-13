@@ -23,4 +23,4 @@ COPY --from=build ../build/libs/jornada_milhas-0.0.1-SNAPSHOT.jar .
 EXPOSE 8080
 
 # Define o comando de entrada para iniciar o aplicativo
-CMD ["java", "-jar", "jornada_milhas-0.0.1-SNAPSHOT.jar"]
+CMD ["sudo", "java", "-jar", "jornada_milhas-0.0.1-SNAPSHOT.jar"]
