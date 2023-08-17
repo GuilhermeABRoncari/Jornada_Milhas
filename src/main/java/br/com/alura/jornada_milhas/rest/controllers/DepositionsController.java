@@ -52,27 +52,7 @@ public class DepositionsController {
 
     @GetMapping("/depoimentos-home")
     public ResponseEntity<List<TestimonyResponseDto>> getRandomThreeDepositions() {
-        List<Testimony> all = repository.findAll();
-        List<TestimonyResponseDto> response = new ArrayList<>();
-        all.forEach(testimony -> response.add(new TestimonyResponseDto(testimony)));
-
-        if (response.size() <= 3) {
-            return ResponseEntity.ok(response);
-        } else {
-            List<TestimonyResponseDto> randomThreeDepositions = new ArrayList<>();
-            Random random = new Random();
-
-            while (randomThreeDepositions.size() < 3) {
-                int randomIndex = random.nextInt(response.size());
-                TestimonyResponseDto randomDeposition = response.get(randomIndex);
-
-                if (!randomThreeDepositions.contains(randomDeposition)) {
-                    randomThreeDepositions.add(randomDeposition);
-                }
-            }
-
-            return ResponseEntity.ok(randomThreeDepositions);
-        }
-
+        List<Testimony> randomThreeDepositions = repository.selectRandomThreeDepositions();
+        return ResponseEntity.ok(randomThreeDepositions.stream().map(TestimonyResponseDto::new).toList());
     }
 }

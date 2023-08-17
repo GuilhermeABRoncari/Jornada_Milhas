@@ -14,7 +14,7 @@ public record DestinationResponseDto(
         @JsonProperty("foto_2")
         String secondPictureUrl,
         String meta,
-        @JsonProperty("text_descritivo")
+        @JsonProperty("texto_descritivo")
         String descriptionText,
         @JsonProperty("preço")
         BigDecimal price
