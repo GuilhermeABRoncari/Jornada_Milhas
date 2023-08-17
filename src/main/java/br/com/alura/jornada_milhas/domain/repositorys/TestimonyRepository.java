@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface TestimonyRepository extends JpaRepository<Testimony, String> {
 
-    @Query("SELECT * FROM Testimony ORDER BY RANDOM() LIMIT 3")
+    @Query("SELECT t FROM Testimony t ORDER BY FUNCTION('RANDOM') LIMIT 3")
     List<Testimony> selectRandomThreeDepositions();
 
 }
