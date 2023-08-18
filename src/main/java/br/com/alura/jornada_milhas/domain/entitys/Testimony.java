@@ -21,12 +21,12 @@ public class Testimony {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
-    String profilePicture;
-    String description;
-    String author;
-    OffsetDateTime postTime;
-    Boolean edited;
+    private String id;
+    private String profilePicture;
+    private String description;
+    private String author;
+    private OffsetDateTime postTime;
+    private Boolean edited;
 
     public Testimony(TestimonyRequestDto testimonyRequestDto) {
         this.profilePicture = testimonyRequestDto.profilePicture();
